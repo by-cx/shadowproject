@@ -1,0 +1,8 @@
+mode: set
+shadowproject/common/task.go:10.37,12.16 2 1
+shadowproject/common/task.go:15.2,15.12 1 1
+shadowproject/common/task.go:12.16,14.3 1 1
+shadowproject/common/task.go:18.35,22.43 3 1
+shadowproject/common/task.go:30.2,32.16 2 1
+shadowproject/common/task.go:22.43,24.17 2 1
+shadowproject/common/task.go:24.17,27.4 2 1
