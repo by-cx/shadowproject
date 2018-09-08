@@ -1,16 +1,16 @@
 package common
 
 type Task struct {
-	Driver ContainerDriver // Container driver for managing containers
+	Driver ContainerDriver // Container driver for managing Containers
 
 	UUID       string   // Identification of the task
-	containers []string // Container's docker IDs
+	Containers []string // Container's docker IDs
 }
 
 func (t *Task) AddContainer() error {
 	containerId, err := t.Driver.Start(t.UUID)
 	if err == nil {
-		t.containers = append(t.containers, containerId)
+		t.Containers = append(t.Containers, containerId)
 	}
 	return err
 }
@@ -19,7 +19,7 @@ func (t *Task) DestroyAll() error {
 	var remainingIds []string
 	var lastErr error
 
-	for _, containerId := range t.containers {
+	for _, containerId := range t.Containers {
 		err := t.Driver.Kill(containerId)
 		if err != nil {
 			lastErr = err
@@ -27,7 +27,7 @@ func (t *Task) DestroyAll() error {
 		}
 	}
 
-	t.containers = remainingIds
+	t.Containers = remainingIds
 
 	return lastErr
 }
