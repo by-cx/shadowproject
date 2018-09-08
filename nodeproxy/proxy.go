@@ -4,8 +4,31 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
+
+// Return HOST:PORT pair to connect to for the specified domain.
+func FindContainer(domain string) (string, error) {
+	var containerUUID string
+	var err error
+
+	if len(MyTask.Containers) > 0 {
+		containerUUID = MyTask.Containers[0]
+	} else {
+		containerUUID, err = MyTask.AddContainer()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	port, err := MyTask.Driver.GetPort(containerUUID)
+	if err != nil {
+		return "", err
+	}
+
+	return "localhost:" + strconv.Itoa(port), nil
+}
 
 // This takes incoming request, updated URL struct and sends it to the backend.
 // Then the response is streamed back including headers.
@@ -13,7 +36,11 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	var remoteRequest http.Request
 	remoteRequest = *r
 
-	var domain = "localhost:32770"
+	// Find the destination
+	domain, err := FindContainer(r.URL.Hostname())
+	if err != nil {
+		panic(err)
+	}
 
 	log.Println(r.Host, "directed to "+domain)
 
@@ -29,7 +56,7 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	response, err := client.Do(&remoteRequest)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Pass headers

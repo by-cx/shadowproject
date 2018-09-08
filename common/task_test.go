@@ -11,8 +11,12 @@ type DummyDriver struct{}
 func (d *DummyDriver) Kill(containerId string) error {
 	return nil
 }
-func (d *DummyDriver) Start(TaskUUID string) (string, error) {
+func (d *DummyDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
 	return "01234", nil
+}
+
+func (d *DummyDriver) GetPort(containerID string) (int, error) {
+	return 32123, nil
 }
 
 // Error backend
@@ -21,8 +25,12 @@ type DummyErrorDriver struct{}
 func (d *DummyErrorDriver) Kill(containerId string) error {
 	return errors.New("Error!")
 }
-func (d *DummyErrorDriver) Start(TaskUUID string) (string, error) {
+func (d *DummyErrorDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
 	return "01234", nil
+}
+
+func (d *DummyErrorDriver) GetPort(containerID string) (int, error) {
+	return 32123, nil
 }
 
 func TestTask(t *testing.T) {

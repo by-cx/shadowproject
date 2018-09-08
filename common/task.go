@@ -5,14 +5,18 @@ type Task struct {
 
 	UUID       string   // Identification of the task
 	Containers []string // Container's docker IDs
+	Domains    []string // Domain list on which this tasks listens
+	Image      string   // Docker image
+	Command    []string // Command to run
 }
 
-func (t *Task) AddContainer() error {
-	containerId, err := t.Driver.Start(t.UUID)
+// Adds new container for this task. Returns container ID and error.
+func (t *Task) AddContainer() (string, error) {
+	containerId, err := t.Driver.Start(t.UUID, t.Image, t.Command)
 	if err == nil {
 		t.Containers = append(t.Containers, containerId)
 	}
-	return err
+	return containerId, err
 }
 
 func (t *Task) DestroyAll() error {

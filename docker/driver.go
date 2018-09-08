@@ -15,13 +15,19 @@ import (
 
 const DOCKER_SOCK = "unix:///var/run/docker.sock"
 const DOCKER_API_VERSION = "1.27"
+const CONTAINER_DEFAULT_PORT = "8000/tcp"
 
 type DockerDriver struct {
 }
 
+func (d *DockerDriver) getClient() (*dockerClient.Client, error) {
+	cli, err := dockerClient.NewClient(DOCKER_SOCK, DOCKER_API_VERSION, nil, nil)
+	return cli, err
+}
+
 func (d *DockerDriver) Kill(containerId string) error {
 	log.Println("Stoping container " + containerId)
-	cli, err := dockerClient.NewClient(DOCKER_SOCK, DOCKER_API_VERSION, nil, nil)
+	cli, err := d.getClient()
 	if err != nil {
 		return err
 	}
@@ -32,9 +38,9 @@ func (d *DockerDriver) Kill(containerId string) error {
 	return err
 }
 
-func (d *DockerDriver) Start(TaskUUID string) (string, error) {
+func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
 	log.Println("Starting container " + TaskUUID)
-	cli, err := dockerClient.NewClient(DOCKER_SOCK, DOCKER_API_VERSION, nil, nil)
+	cli, err := d.getClient()
 	if err != nil {
 		return "", err
 	}
@@ -51,12 +57,15 @@ func (d *DockerDriver) Start(TaskUUID string) (string, error) {
 		&container.Config{
 			Hostname: TaskUUID,
 			Env:      []string{},
-			Image:    "ubuntu:bionic",
-			Cmd:      []string{"sleep", "60"},
+			Image:    image,
+			Cmd:      cmd,
 		},
 		&container.HostConfig{
 			PortBindings: portmaps,
 			AutoRemove:   true,
+			Binds: []string{
+				"/srv/" + TaskUUID + ":/srv",
+			},
 		},
 		&network.NetworkingConfig{},
 		TaskUUID+strconv.Itoa(rand.Int()),
@@ -69,5 +78,22 @@ func (d *DockerDriver) Start(TaskUUID string) (string, error) {
 
 	err = cli.ContainerStart(context.TODO(), createdContainer.ID, types.ContainerStartOptions{})
 
-	return containerId, nil
+	return containerId, err
+}
+
+func (d *DockerDriver) GetPort(containerID string) (int, error) {
+	cli, err := d.getClient()
+	if err != nil {
+		return 0, err
+	}
+
+	containerDetails, err := cli.ContainerInspect(context.TODO(), containerID)
+	if err != nil {
+		return 0, err
+	}
+
+	hostPort := containerDetails.NetworkSettings.Ports[CONTAINER_DEFAULT_PORT][0].HostPort
+	port, err := strconv.Atoi(hostPort)
+
+	return port, err
 }
