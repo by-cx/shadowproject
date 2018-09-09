@@ -19,7 +19,11 @@ func (d *DummyDriver) GetPort(containerID string) (int, error) {
 	return 32123, nil
 }
 
-// Error backend
+func (d *DummyDriver) Clear() error {
+	return nil
+}
+
+// Error dummy backend
 type DummyErrorDriver struct{}
 
 func (d *DummyErrorDriver) Kill(containerId string) error {
@@ -33,6 +37,11 @@ func (d *DummyErrorDriver) GetPort(containerID string) (int, error) {
 	return 32123, nil
 }
 
+func (d *DummyErrorDriver) Clear() error {
+	return nil
+}
+
+// The test
 func TestTask(t *testing.T) {
 	// Valid state
 	task := Task{

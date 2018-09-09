@@ -97,3 +97,38 @@ func (d *DockerDriver) GetPort(containerID string) (int, error) {
 
 	return port, err
 }
+
+// Removes all containers the server contains
+func (d *DockerDriver) Clear() error {
+	log.Println("Clearing docker containers")
+	cli, err := d.getClient()
+	if err != nil {
+		return err
+	}
+
+	timeout := time.Second * 30
+
+	// Stop all containers
+	containers, err := cli.ContainerList(context.TODO(), types.ContainerListOptions{})
+	if err != nil {
+		return err
+	}
+	for _, container := range containers {
+		err = cli.ContainerStop(context.TODO(), container.ID, &timeout)
+		// TODO: write this to stderr
+		log.Println(err)
+	}
+
+	// Remove all containers
+	containers, err = cli.ContainerList(context.TODO(), types.ContainerListOptions{})
+	if err != nil {
+		return err
+	}
+	for _, container := range containers {
+		err = cli.ContainerRemove(context.TODO(), container.ID, types.ContainerRemoveOptions{})
+		// TODO: write this to stderr
+		log.Println(err)
+	}
+
+	return nil
+}

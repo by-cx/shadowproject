@@ -1,0 +1,16 @@
+### Send POST request with json body
+POST http://localhost:1323/tasks/
+Content-Type: application/json
+
+{
+  "image": "creckx/testimage",
+  "domains": ["localhost:8080"],
+  "command": ["/srv/testtask"]
+}
+
+###
+
+GET http://localhost:1323/tasks/
+Content-Type: application/json
+
+###
