@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo"
+	"strconv"
 )
 
 var taskStorage TaskStorageInterface
@@ -22,5 +23,5 @@ func main() {
 	e.POST("/tasks/", CreateTaskHandler)
 	e.GET("/tasks/", ListTaskHandler)
 	e.GET("/tasks/by-domain/:domain", GetTaskByDomainHandler)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":" + strconv.Itoa(config.Port)))
 }

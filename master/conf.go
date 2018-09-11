@@ -10,6 +10,7 @@ import (
 // Every configuration directive has to go here
 type MasterConfig struct {
 	DatabaseFile string `env:"DBPath" envDefault:"tasks.db"`
+	Port         int    `env:"PORT" envDefault:"8080"`
 }
 
 // Handle the config

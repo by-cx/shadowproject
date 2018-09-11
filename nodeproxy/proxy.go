@@ -88,10 +88,10 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	remoteRequest.URL.Scheme = "http"
 
 	// Do the remote request
-	client := http.Client{
+	httpClient := http.Client{
 		Timeout: time.Second * PROXY_TIMEOUT,
 	}
-	response, err := client.Do(&remoteRequest)
+	response, err := httpClient.Do(&remoteRequest)
 	if err != nil {
 		panic(err)
 	}
