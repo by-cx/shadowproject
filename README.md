@@ -35,7 +35,7 @@ what containers to kill and what let to run.
 
 The architecture is not finished yet and a lot of things can change.
 
-![Shadow scheme](contrib/Shadow.png)
+![Shadow scheme](contrib/Shadow.jpg)
 
 ## Longterm TODO:
 
