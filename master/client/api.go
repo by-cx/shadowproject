@@ -1,0 +1,81 @@
+package client
+
+import (
+	"bytes"
+	"encoding/json"
+	"github.com/levigross/grequests"
+	"shadowproject/common"
+)
+
+type ShadowMasterClient struct {
+	Host string
+	Port int
+}
+
+func (s *ShadowMasterClient) formatURL(action string) string {
+	return ""
+}
+
+func (s *ShadowMasterClient) AddTask(domains []string, image string, command []string) (*common.Task, error) {
+	var task common.Task
+
+	requestTask := &common.Task{
+		Domains: domains,
+		Image:   image,
+		Command: command,
+	}
+	requestData, err := json.Marshal(requestTask)
+	if err != nil {
+		return &task, err
+	}
+
+	reader := bytes.NewReader(requestData)
+
+	resp, err := grequests.Post(
+		s.formatURL("/tasks/"),
+		&grequests.RequestOptions{RequestBody: reader},
+	)
+
+	if err != nil {
+		return &task, err
+	}
+
+	err = json.Unmarshal(resp.Bytes(), &task)
+	if err != nil {
+		panic(err)
+	}
+
+	return &task, nil
+}
+
+func (s *ShadowMasterClient) ListTasks() ([]common.Task, error) {
+	var tasks []common.Task
+
+	resp, err := grequests.Get(s.formatURL("/tasks/"), nil)
+	if err != nil {
+		return tasks, err
+	}
+
+	err = json.Unmarshal(resp.Bytes(), tasks)
+	if err != nil {
+		panic(err)
+	}
+
+	return tasks, nil
+}
+
+func (s *ShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task, error) {
+	var task common.Task
+
+	resp, err := grequests.Get(s.formatURL("/tasks/by-domain/"+wantedDomain), nil)
+	if err != nil {
+		return &task, err
+	}
+
+	err = json.Unmarshal(resp.Bytes(), &task)
+	if err != nil {
+		panic(err)
+	}
+
+	return &task, nil
+}

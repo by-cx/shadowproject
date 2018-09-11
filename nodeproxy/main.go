@@ -3,17 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
-	"shadowproject/common"
 	"shadowproject/docker"
 )
 
-// Test task
-var MyTask = common.Task{
-	Driver:  &docker.DockerDriver{},
-	UUID:    "bainimiepaevaichaoloeloneisieshu",
-	Domains: []string{"localhost"},
-	Image:   "creckx/testimage",
-	Command: []string{"/srv/testtask"},
+var config NodeProxyConfig
+
+func init() {
+	// Handle config
+	ProcessEnvironmentVariables(&config)
 }
 
 func init() {

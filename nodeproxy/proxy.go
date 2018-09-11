@@ -4,25 +4,62 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"shadowproject/common"
+	shadowerrors "shadowproject/common/errors"
+	"shadowproject/master/client"
 	"strconv"
 	"time"
 )
+
+var TaskCache map[string]*common.Task
+
+func GetShadowClient() *client.ShadowMasterClient {
+	return &client.ShadowMasterClient{
+		Host: config.MasterHost,
+		Port: config.MasterPort,
+	}
+}
+
+// Get task from cache if it's possible otherwise use
+// TODO: check regularly changes in cached tasks, remove all containers in case of change and create new ones
+func GetTaskByDomain(domain string) *common.Task {
+	var err error
+	var task *common.Task
+	shadowClient := GetShadowClient()
+
+	if val, ok := TaskCache[domain]; ok {
+		return val
+	} else {
+		task, err = shadowClient.GetTaskByDomain(domain)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "backend connection error",
+			})
+		}
+		TaskCache[domain] = task
+	}
+
+	return task
+}
 
 // Return HOST:PORT pair to connect to for the specified domain.
 func FindContainer(domain string) (string, error) {
 	var containerUUID string
 	var err error
 
-	if len(MyTask.Containers) > 0 {
-		containerUUID = MyTask.Containers[0]
+	task := GetTaskByDomain(domain)
+
+	if len(task.Containers) > 0 {
+		containerUUID = task.Containers[0]
 	} else {
-		containerUUID, err = MyTask.AddContainer()
+		containerUUID, err = task.AddContainer()
 		if err != nil {
 			return "", err
 		}
 	}
 
-	port, err := MyTask.Driver.GetPort(containerUUID)
+	port, err := task.Driver.GetPort(containerUUID)
 	if err != nil {
 		return "", err
 	}

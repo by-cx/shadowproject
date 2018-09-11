@@ -14,3 +14,10 @@ GET http://localhost:1323/tasks/
 Content-Type: application/json
 
 ###
+
+# Get by domain
+
+GET http://localhost:1323/tasks/by-domain/localhost:8080
+Content-Type: application/json
+
+###

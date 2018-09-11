@@ -10,6 +10,14 @@
   version = "v0.4.11"
 
 [[projects]]
+  digest = "1:e361cb646a33874cf6521b5c4e77c9208b4b58c7fd3893b8c87f61f49b19d991"
+  name = "github.com/caarlos0/env"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "1cddc31c48c56ecd700d873edb9fd5b6f5df922a"
+  version = "v3.3.0"
+
+[[projects]]
   digest = "1:3cabbabc9e0e4aa7e12b882bdc213f41cf8bd2b2ce2a7b5e0aceaf8a6a78049b"
   name = "github.com/docker/distribution"
   packages = [
@@ -74,6 +82,14 @@
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
+  branch = "master"
+  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  pruneopts = "UT"
+  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
   digest = "1:26971a24734a1b911111711f981ffc7463361b36483456f33da623570b7d214c"
   name = "github.com/labstack/echo"
   packages = ["."]
@@ -91,6 +107,14 @@
   pruneopts = "UT"
   revision = "d6898124de917583f5ff5592ef931d1dfe0ddc05"
   version = "0.2.6"
+
+[[projects]]
+  digest = "1:c34de7e8f144a065dbcd5a5dab3dfc865d406545da86cd5a654fa720abfa8126"
+  name = "github.com/levigross/grequests"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d0df86deffcb5d344ab23de5a958d41e44659568"
+  version = "0.10"
 
 [[projects]]
   digest = "1:c658e84ad3916da105a761660dcaeb01e63416c8ec7bc62256a9b411a05fcd67"
@@ -174,13 +198,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:58cb5fbdf85e1f468c749aa31773ff102866831106f52762b2823ae235ca11e7"
+  digest = "1:094f7bb1f423ae3c6284d70f2c3b305c464b184a5bda684a21e5dc6af8749dc2"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
+    "idna",
     "internal/socks",
     "proxy",
+    "publicsuffix",
   ]
   pruneopts = "UT"
   revision = "161cd47e91fd58ac17490ef4d742dc98bb4cf60e"
@@ -196,20 +222,46 @@
   pruneopts = "UT"
   revision = "917fdcba135dcbaccd57425db91723541b4427c8"
 
+[[projects]]
+  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+  ]
+  pruneopts = "UT"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/caarlos0/env",
     "github.com/docker/docker/api/types",
     "github.com/docker/docker/api/types/container",
     "github.com/docker/docker/api/types/network",
     "github.com/docker/docker/client",
     "github.com/docker/go-connections/nat",
     "github.com/labstack/echo",
+    "github.com/levigross/grequests",
     "github.com/pkg/errors",
     "github.com/satori/go.uuid",
     "github.com/syndtr/goleveldb/leveldb",
     "github.com/syndtr/goleveldb/leveldb/opt",
+    "github.com/syndtr/goleveldb/leveldb/util",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
