@@ -6,26 +6,17 @@ import (
 	"net/http"
 	"shadowproject/common"
 	shadowerrors "shadowproject/common/errors"
-	"shadowproject/master/client"
 	"strconv"
 	"time"
 )
 
-var TaskCache map[string]*common.Task
-
-func GetShadowClient() *client.ShadowMasterClient {
-	return &client.ShadowMasterClient{
-		Host: config.MasterHost,
-		Port: config.MasterPort,
-	}
-}
+var TaskCache = make(map[string]*common.Task)
 
 // Get task from cache if it's possible otherwise use
 // TODO: check regularly changes in cached tasks, remove all containers in case of change and create new ones
 func GetTaskByDomain(domain string) *common.Task {
 	var err error
 	var task *common.Task
-	shadowClient := GetShadowClient()
 
 	if val, ok := TaskCache[domain]; ok {
 		return val

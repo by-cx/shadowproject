@@ -7,7 +7,7 @@ import (
 )
 
 type Task struct {
-	Driver ContainerDriver `json:"-"` // Container driver for managing Containers
+	Driver docker.ContainerDriverInterface `json:"-"` // Container driver for managing Containers
 
 	UUID       string   `json:"uuid"`    // Identification of the task
 	Containers []string `json:"-"`       // Container's docker IDs

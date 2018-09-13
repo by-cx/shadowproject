@@ -3,17 +3,19 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/levigross/grequests"
 	"shadowproject/common"
 )
 
 type ShadowMasterClient struct {
-	Host string
-	Port int
+	Proto string
+	Host  string
+	Port  int
 }
 
 func (s *ShadowMasterClient) formatURL(action string) string {
-	return ""
+	return fmt.Sprintf("%s//%s:%d%s", s.Proto, s.Host, s.Port, action)
 }
 
 func (s *ShadowMasterClient) AddTask(domains []string, image string, command []string) (*common.Task, error) {

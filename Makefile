@@ -1,4 +1,4 @@
-modules=./common ./master ./proxy ./docker
+modules=./common ./common/errors ./master ./master/client ./proxy ./docker ./nodeproxy
 
 .PHONY: all
 all: build

@@ -9,13 +9,13 @@ import (
 // Config structure
 // Every configuration directive has to go here
 type NodeProxyConfig struct {
-	MasterHost string `env:"Host" envDefault:"localhost"`
-	MasterPort int    `env:"Port" envDefault:"8080"`
+	MasterHost string `env:"HOST" envDefault:"localhost"`
+	MasterPort int    `env:"PORT" envDefault:"8080"`
 }
 
 // Handle the config
 func ProcessEnvironmentVariables(config *NodeProxyConfig) {
-	err := env.Parse(&config)
+	err := env.Parse(config)
 	if err != nil {
 		log.Fatalln(err)
 	}
