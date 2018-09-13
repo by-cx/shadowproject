@@ -40,6 +40,7 @@ func FindContainer(domain string) (string, error) {
 	var err error
 
 	task := GetTaskByDomain(domain)
+	task.Driver = dockerDriver
 
 	if len(task.Containers) > 0 {
 		containerUUID = task.Containers[0]
@@ -65,7 +66,7 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	remoteRequest = *r
 
 	// Find the destination
-	domain, err := FindContainer(r.URL.Hostname())
+	domain, err := FindContainer(r.Host)
 	if err != nil {
 		panic(err)
 	}

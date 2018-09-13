@@ -15,7 +15,7 @@ type MasterConfig struct {
 
 // Handle the config
 func ProcessEnvironmentVariables(config *MasterConfig) {
-	err := env.Parse(&config)
+	err := env.Parse(config)
 	if err != nil {
 		log.Fatalln(err)
 	}

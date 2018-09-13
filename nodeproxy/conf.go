@@ -9,8 +9,10 @@ import (
 // Config structure
 // Every configuration directive has to go here
 type NodeProxyConfig struct {
-	MasterHost string `env:"HOST" envDefault:"localhost"`
-	MasterPort int    `env:"PORT" envDefault:"8080"`
+	MasterHost  string `env:"MASTER_HOST" envDefault:"localhost"`
+	MasterPort  int    `env:"MASTER_PORT" envDefault:"8080"`
+	MasterProto string `env:"MASTER_PROTO" envDefault:"http"`
+	Port        int    `env:"PORT" envDefault:"8081"`
 }
 
 // Handle the config

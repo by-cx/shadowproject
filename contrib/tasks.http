@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "image": "creckx/testimage",
-  "domains": ["localhost:8080"],
+  "domains": ["localhost:8081"],
   "command": ["/srv/testtask"]
 }
 

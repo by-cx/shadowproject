@@ -5,26 +5,30 @@ import (
 )
 
 //// Docker mock driver
-type MockDockerDriver struct{}
+type MockDockerDriver struct {
+	ReturnedErr error
+}
 
 func (m *MockDockerDriver) Kill(containerId string) error {
-	return nil
+	return m.ReturnedErr
 }
 
 func (m *MockDockerDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
-	return "coomeeweebaibasaofiijengiefeejoh", nil
+	return "coomeeweebaibasaofiijengiefeejoh", m.ReturnedErr
 }
 
 func (m *MockDockerDriver) GetPort(containerID string) (int, error) {
-	return 32000, nil
+	return 32000, m.ReturnedErr
 }
 
 func (m *MockDockerDriver) Clear() error {
-	return nil
+	return m.ReturnedErr
 }
 
 //// Mock client to test backend calls
-type MockShadowMasterClient struct{}
+type MockShadowMasterClient struct {
+	ReturnedErr error
+}
 
 func (m *MockShadowMasterClient) AddTask(domains []string, image string, command []string) (*common.Task, error) {
 	return &common.Task{
@@ -33,7 +37,7 @@ func (m *MockShadowMasterClient) AddTask(domains []string, image string, command
 		Domains: domains,
 		Image:   image,
 		Command: command,
-	}, nil
+	}, m.ReturnedErr
 }
 
 func (m *MockShadowMasterClient) ListTasks() ([]common.Task, error) {
@@ -45,7 +49,7 @@ func (m *MockShadowMasterClient) ListTasks() ([]common.Task, error) {
 			Image:   "shadow/testimage",
 			Command: []string{"/srv/a_binary"},
 		},
-	}, nil
+	}, m.ReturnedErr
 }
 
 func (m *MockShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task, error) {
@@ -55,10 +59,5 @@ func (m *MockShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.T
 		Domains: []string{"localhost"},
 		Image:   "shadow/testimage",
 		Command: []string{"/srv/a_binary"},
-	}, nil
+	}, m.ReturnedErr
 }
-
-//// Set up the test environment
-//func TestMain(m *testing.M) {
-//	//shadowClient = &MockShadowMasterClient{}
-//}

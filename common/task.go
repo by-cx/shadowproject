@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"shadowproject/docker"
+	"strings"
 )
 
 type Task struct {
@@ -21,7 +22,7 @@ func NewTask(domains []string, image string, command []string) (*Task, []error) 
 
 	taskUUID := uuid.NewV4()
 	task.Driver = &docker.DockerDriver{}
-	task.UUID = taskUUID.String()
+	task.UUID = strings.Replace(taskUUID.String(), "-", "", -1)
 	task.Domains = domains
 	task.Image = image
 	task.Command = command

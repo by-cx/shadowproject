@@ -3,8 +3,10 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/levigross/grequests"
+	"net/http"
 	"shadowproject/common"
 )
 
@@ -15,7 +17,7 @@ type ShadowMasterClient struct {
 }
 
 func (s *ShadowMasterClient) formatURL(action string) string {
-	return fmt.Sprintf("%s//%s:%d%s", s.Proto, s.Host, s.Port, action)
+	return fmt.Sprintf("%s://%s:%d%s", s.Proto, s.Host, s.Port, action)
 }
 
 func (s *ShadowMasterClient) AddTask(domains []string, image string, command []string) (*common.Task, error) {
@@ -72,6 +74,10 @@ func (s *ShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task,
 	resp, err := grequests.Get(s.formatURL("/tasks/by-domain/"+wantedDomain), nil)
 	if err != nil {
 		return &task, err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return &task, errors.New(resp.RawResponse.Status)
 	}
 
 	err = json.Unmarshal(resp.Bytes(), &task)
