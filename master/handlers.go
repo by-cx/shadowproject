@@ -25,7 +25,10 @@ func CreateTaskHandler(c echo.Context) error {
 		return c.JSONPretty(http.StatusBadRequest, common.GeneralResponse{Message: message}, common.JSON_INDENT)
 	}
 
-	taskStorage.Add(task)
+	err = taskStorage.Add(task)
+	if err != nil {
+		return c.JSONPretty(http.StatusBadRequest, common.GeneralResponse{Message: err.Error()}, common.JSON_INDENT)
+	}
 
 	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)
 }
@@ -46,4 +49,20 @@ func GetTaskByDomainHandler(c echo.Context) error {
 	}
 
 	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)
+}
+
+// Handler for deleting stuff
+func DeleteTaskHandler(c echo.Context) error {
+	taskUUID := c.Param("uuid")
+
+	err := taskStorage.Delete(taskUUID)
+	if err != nil {
+		return c.JSONPretty(
+			http.StatusInternalServerError,
+			common.GeneralResponse{Message: err.Error()},
+			common.JSON_INDENT,
+		)
+	}
+
+	return c.JSONPretty(http.StatusOK, common.GeneralResponse{Message: "ok"}, common.JSON_INDENT)
 }

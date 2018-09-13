@@ -16,13 +16,15 @@ func main() {
 	taskStorage = &TaskStorage{
 		DatabasePath: config.DatabaseFile,
 	}
+	db := taskStorage.open()
+	defer db.Close()
 
-	// TODO: Delete tasks
 	// TODO: Update tasks
 
 	e := echo.New()
 	e.POST("/tasks/", CreateTaskHandler)
 	e.GET("/tasks/", ListTaskHandler)
+	e.DELETE("/tasks/:uuid", DeleteTaskHandler)
 	e.GET("/tasks/by-domain/:domain", GetTaskByDomainHandler)
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(config.Port)))
 }

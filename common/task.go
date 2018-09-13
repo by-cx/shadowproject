@@ -36,7 +36,7 @@ func NewTask(domains []string, image string, command []string) (*Task, []error) 
 func (t *Task) Validate() []error {
 	var errorList []error
 
-	if len(t.UUID) == 32 {
+	if len(t.UUID) != 32 {
 		errorList = append(errorList, errors.New("the UUID has to be 32 characters long string"))
 	}
 	if len(t.Image) == 0 {

@@ -18,7 +18,7 @@ func (m *MockDockerDriver) Start(TaskUUID string, image string, cmd []string) (s
 }
 
 func (m *MockDockerDriver) GetPort(containerID string) (int, error) {
-	return 32000, m.ReturnedErr
+	return 80, m.ReturnedErr
 }
 
 func (m *MockDockerDriver) Clear() error {

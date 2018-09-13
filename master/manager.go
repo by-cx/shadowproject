@@ -8,26 +8,33 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 	"shadowproject/common"
 	shadowerrors "shadowproject/common/errors"
+	"strings"
 )
 
 type TaskStorage struct {
 	DatabasePath string
+	db           *leveldb.DB
 }
 
 // Open the task storage
 func (l *TaskStorage) open() *leveldb.DB {
-	db, err := leveldb.OpenFile(l.DatabasePath, nil)
-	if err != nil {
-		panic(shadowerrors.ShadowError{
-			Origin:         err,
-			VisibleMessage: "cannot open the database",
-		})
+	if l.db == nil {
+		db, err := leveldb.OpenFile(l.DatabasePath, nil)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "cannot open the database",
+			})
+		}
+		l.db = db
+		return db
 	}
-	return db
+
+	return l.db
 }
 
 // Add a new task
-func (l *TaskStorage) Add(task *common.Task) {
+func (l *TaskStorage) Add(task *common.Task) error {
 	jsonBody, err := json.Marshal(task)
 	if err != nil {
 		panic(shadowerrors.ShadowError{
@@ -37,7 +44,16 @@ func (l *TaskStorage) Add(task *common.Task) {
 	}
 
 	db := l.open()
-	defer db.Close()
+
+	var duplicatedDomains []string
+	for _, domain := range task.Domains {
+		if l.CheckDomainDuplicity(domain) != "" {
+			duplicatedDomains = append(duplicatedDomains, domain)
+		}
+	}
+	if len(duplicatedDomains) != 0 {
+		return errors.New("these domains are already in the system: " + strings.Join(duplicatedDomains, ", "))
+	}
 
 	err = db.Put([]byte("task:"+task.UUID), jsonBody, &opt.WriteOptions{})
 	if err != nil {
@@ -46,6 +62,8 @@ func (l *TaskStorage) Add(task *common.Task) {
 			VisibleMessage: "database error",
 		})
 	}
+
+	return nil
 }
 
 // Return list of all tasks
@@ -54,7 +72,6 @@ func (l *TaskStorage) Filter() []common.Task {
 	var task common.Task
 
 	db := l.open()
-	defer db.Close()
 
 	iter := db.NewIterator(util.BytesPrefix([]byte("task:")), nil)
 	for iter.Next() {
@@ -71,12 +88,18 @@ func (l *TaskStorage) Filter() []common.Task {
 	return tasks
 }
 
+// Delete a task
+func (l *TaskStorage) Delete(taskUUID string) error {
+	db := l.open()
+
+	return db.Delete([]byte("task:"+taskUUID), &opt.WriteOptions{})
+}
+
 // Filter one task based on a wanted domain
 func (l *TaskStorage) GetByDomain(wantedDomain string) (*common.Task, error) {
 	var task common.Task
 
 	db := l.open()
-	defer db.Close()
 
 	iter := db.NewIterator(util.BytesPrefix([]byte("task:")), nil)
 	for iter.Next() {
@@ -96,4 +119,32 @@ func (l *TaskStorage) GetByDomain(wantedDomain string) (*common.Task, error) {
 	}
 
 	return nil, errors.New("no task found")
+}
+
+// Check for domain duplicity
+// Returns task id in case it finds the given domain in the db
+// Empty string means not found
+func (l *TaskStorage) CheckDomainDuplicity(domainToCheck string) string {
+	var task common.Task
+
+	db := l.open()
+
+	iter := db.NewIterator(util.BytesPrefix([]byte("task:")), nil)
+	for iter.Next() {
+		err := json.Unmarshal(iter.Value(), &task)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "marshal error",
+			})
+		}
+
+		for _, domain := range task.Domains {
+			if domain == domainToCheck {
+				return strings.Split(string(iter.Key()), ":")[1]
+			}
+		}
+	}
+
+	return ""
 }

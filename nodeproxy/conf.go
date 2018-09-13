@@ -13,6 +13,7 @@ type NodeProxyConfig struct {
 	MasterPort  int    `env:"MASTER_PORT" envDefault:"8080"`
 	MasterProto string `env:"MASTER_PROTO" envDefault:"http"`
 	Port        int    `env:"PORT" envDefault:"8081"`
+	ProxyTarget string `env:"PROXY_TARGET" envDefault:"localhost"`
 }
 
 // Handle the config

@@ -1,5 +1,5 @@
 ### Send POST request with json body
-POST http://localhost:1323/tasks/
+POST http://localhost:8080/tasks/
 Content-Type: application/json
 
 {
@@ -10,14 +10,20 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:1323/tasks/
+GET http://localhost:8080/tasks/
 Content-Type: application/json
 
 ###
 
 # Get by domain
 
-GET http://localhost:1323/tasks/by-domain/localhost:8080
+GET http://localhost:8080/tasks/by-domain/localhost:8081
 Content-Type: application/json
+
+###
+
+# Delete by UUID
+
+DELETE http://localhost:8080/tasks/c7d45d0c-20ca-4e45-9512-2f7dcc46bb54
 
 ###

@@ -56,7 +56,7 @@ func FindContainer(domain string) (string, error) {
 		return "", err
 	}
 
-	return "localhost:" + strconv.Itoa(port), nil
+	return config.ProxyTarget + ":" + strconv.Itoa(port), nil
 }
 
 // This takes incoming request, updated URL struct and sends it to the backend.
