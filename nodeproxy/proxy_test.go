@@ -7,6 +7,7 @@ import (
 
 func TestGetTaskByDomain(t *testing.T) {
 	shadowClient = &MockShadowMasterClient{}
+	dockerDriver = &MockDockerDriver{}
 
 	task := GetTaskByDomain("localhost")
 	assert.Equal(t, task.Domains, []string{"localhost"})
@@ -14,6 +15,7 @@ func TestGetTaskByDomain(t *testing.T) {
 
 func TestFindContainer(t *testing.T) {
 	shadowClient = &MockShadowMasterClient{}
+	dockerDriver = &MockDockerDriver{}
 
 	containerId, err := FindContainer("localhost")
 
