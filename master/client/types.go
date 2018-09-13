@@ -6,5 +6,6 @@ import "shadowproject/common"
 type ShadowMasterClientInterface interface {
 	AddTask(domains []string, image string, command []string) (*common.Task, error)
 	ListTasks() ([]common.Task, error)
+	GetTask(TaskUUID string) (*common.Task, error)
 	GetTaskByDomain(wantedDomain string) (*common.Task, error)
 }

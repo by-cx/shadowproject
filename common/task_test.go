@@ -1,45 +1,38 @@
 package common
 
 import (
-	"github.com/pkg/errors"
 	"testing"
 )
 
 // Dummy ok backend
 type DummyDriver struct{}
 
-func (d *DummyDriver) Kill(containerId string) error {
-	return nil
+func (d *DummyDriver) IsExist(TaskUUID string) []string {
+	return []string{}
 }
-func (d *DummyDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
-	return "01234", nil
+func (d *DummyDriver) Kill(containerId string) {}
+func (d *DummyDriver) Start(TaskUUID string, image string, cmd []string) string {
+	return "01234"
 }
-
-func (d *DummyDriver) GetPort(containerID string) (int, error) {
-	return 32123, nil
+func (d *DummyDriver) GetPort(containerID string) int {
+	return 32123
 }
-
-func (d *DummyDriver) Clear() error {
-	return nil
-}
+func (d *DummyDriver) Clear() {}
 
 // Error dummy backend
 type DummyErrorDriver struct{}
 
-func (d *DummyErrorDriver) Kill(containerId string) error {
-	return errors.New("Error!")
+func (d *DummyErrorDriver) IsExist(TaskUUID string) []string {
+	return []string{}
 }
-func (d *DummyErrorDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
-	return "01234", nil
+func (d *DummyErrorDriver) Kill(containerId string) {}
+func (d *DummyErrorDriver) Start(TaskUUID string, image string, cmd []string) string {
+	return "01234"
 }
-
-func (d *DummyErrorDriver) GetPort(containerID string) (int, error) {
-	return 32123, nil
+func (d *DummyErrorDriver) GetPort(containerID string) int {
+	return 32123
 }
-
-func (d *DummyErrorDriver) Clear() error {
-	return nil
-}
+func (d *DummyErrorDriver) Clear() {}
 
 // The test
 func TestTask(t *testing.T) {

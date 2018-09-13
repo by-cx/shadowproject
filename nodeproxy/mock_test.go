@@ -5,25 +5,23 @@ import (
 )
 
 //// Docker mock driver
-type MockDockerDriver struct {
-	ReturnedErr error
+type MockDockerDriver struct{}
+
+func (m *MockDockerDriver) IsExist(TaskUUID string) []string {
+	return []string{}
 }
 
-func (m *MockDockerDriver) Kill(containerId string) error {
-	return m.ReturnedErr
+func (m *MockDockerDriver) Kill(containerId string) {}
+
+func (m *MockDockerDriver) Start(TaskUUID string, image string, cmd []string) string {
+	return "coomeeweebaibasaofiijengiefeejoh"
 }
 
-func (m *MockDockerDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
-	return "coomeeweebaibasaofiijengiefeejoh", m.ReturnedErr
+func (m *MockDockerDriver) GetPort(containerID string) int {
+	return 80
 }
 
-func (m *MockDockerDriver) GetPort(containerID string) (int, error) {
-	return 80, m.ReturnedErr
-}
-
-func (m *MockDockerDriver) Clear() error {
-	return m.ReturnedErr
-}
+func (m *MockDockerDriver) Clear() {}
 
 //// Mock client to test backend calls
 type MockShadowMasterClient struct {

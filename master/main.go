@@ -24,6 +24,7 @@ func main() {
 	e := echo.New()
 	e.POST("/tasks/", CreateTaskHandler)
 	e.GET("/tasks/", ListTaskHandler)
+	e.GET("/tasks/:uuid", GetTaskHandler)
 	e.DELETE("/tasks/:uuid", DeleteTaskHandler)
 	e.GET("/tasks/by-domain/:domain", GetTaskByDomainHandler)
 	e.Logger.Fatal(e.Start(":" + strconv.Itoa(config.Port)))

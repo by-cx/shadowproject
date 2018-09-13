@@ -51,6 +51,18 @@ func GetTaskByDomainHandler(c echo.Context) error {
 	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)
 }
 
+// Handler to get complete task based on its UUID
+func GetTaskHandler(c echo.Context) error {
+	taskUUID := c.Param("uuid")
+
+	task, err := taskStorage.Get(taskUUID)
+	if err != nil {
+		return c.JSONPretty(http.StatusNotFound, common.GeneralResponse{Message: err.Error()}, common.JSON_INDENT)
+	}
+
+	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)
+}
+
 // Handler for deleting stuff
 func DeleteTaskHandler(c echo.Context) error {
 	taskUUID := c.Param("uuid")

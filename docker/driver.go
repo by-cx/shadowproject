@@ -9,7 +9,9 @@ import (
 	"github.com/docker/go-connections/nat"
 	"log"
 	"math/rand"
+	shadowerrors "shadowproject/common/errors"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -17,33 +19,67 @@ const DOCKER_SOCK = "unix:///var/run/docker.sock"
 const DOCKER_API_VERSION = "1.27"
 const CONTAINER_DEFAULT_PORT = "8000/tcp"
 
-type DockerDriver struct {
-}
+type DockerDriver struct{}
 
-func (d *DockerDriver) getClient() (*dockerClient.Client, error) {
+func (d *DockerDriver) getClient() *dockerClient.Client {
 	cli, err := dockerClient.NewClient(DOCKER_SOCK, DOCKER_API_VERSION, nil, nil)
-	return cli, err
+
+	if err != nil {
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "kill docker container error",
+		})
+	}
+
+	return cli
 }
 
-func (d *DockerDriver) Kill(containerId string) error {
-	log.Println("Stoping container " + containerId)
-	cli, err := d.getClient()
-	if err != nil {
-		return err
-	}
+func (d *DockerDriver) Kill(containerId string) {
+	log.Println("Stopping container " + containerId)
+	cli := d.getClient()
 
 	timeout := time.Duration(30 * time.Second)
-	err = cli.ContainerStop(context.TODO(), containerId, &timeout)
+	err := cli.ContainerStop(context.TODO(), containerId, &timeout)
 
-	return err
+	if err != nil {
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "kill docker container error",
+		})
+	}
 }
 
-func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) (string, error) {
-	log.Println("Starting container " + TaskUUID)
-	cli, err := d.getClient()
+// Checks existence of the container based on Task UUID.
+// Returns container IDs in case of existence. Otherwise
+// empty slice.
+func (d *DockerDriver) IsExist(TaskUUID string) []string {
+	var containerIDs = make([]string, 0)
+
+	cli := d.getClient()
+
+	containers, err := cli.ContainerList(context.TODO(), types.ContainerListOptions{})
 	if err != nil {
-		return "", err
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "docker error",
+		})
 	}
+	for _, containerObject := range containers {
+		for _, name := range containerObject.Names {
+			name = strings.Trim(name, "/")
+			if strings.Split(name, ".")[0] == TaskUUID {
+				containerIDs = append(containerIDs, containerObject.ID)
+			}
+		}
+	}
+
+	return containerIDs
+}
+
+// Starts the container
+func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) string {
+	log.Println("Starting container " + TaskUUID)
+	cli := d.getClient()
 
 	portmaps := make(nat.PortMap, 1)
 	portbindings := make([]nat.PortBinding, 1)
@@ -68,67 +104,80 @@ func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) (strin
 			},
 		},
 		&network.NetworkingConfig{},
-		TaskUUID+strconv.Itoa(rand.Int()),
+		TaskUUID+"."+strconv.Itoa(rand.Int()), // for multiple containers per task per server
 	)
 	if err != nil {
-		return "", err
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "start docker container error",
+		})
 	}
 
 	containerId := createdContainer.ID
 
 	err = cli.ContainerStart(context.TODO(), createdContainer.ID, types.ContainerStartOptions{})
 
-	return containerId, err
+	return containerId
 }
 
-func (d *DockerDriver) GetPort(containerID string) (int, error) {
-	cli, err := d.getClient()
-	if err != nil {
-		return 0, err
-	}
+// Return port we should redirect the request to
+func (d *DockerDriver) GetPort(containerID string) int {
+	cli := d.getClient()
 
 	containerDetails, err := cli.ContainerInspect(context.TODO(), containerID)
 	if err != nil {
-		return 0, err
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "docker get port error",
+		})
 	}
 
 	hostPort := containerDetails.NetworkSettings.Ports[CONTAINER_DEFAULT_PORT][0].HostPort
 	port, err := strconv.Atoi(hostPort)
 
-	return port, err
+	return port
 }
 
 // Removes all containers the server contains
-func (d *DockerDriver) Clear() error {
+func (d *DockerDriver) Clear() {
 	log.Println("Clearing docker containers")
-	cli, err := d.getClient()
-	if err != nil {
-		return err
-	}
+	cli := d.getClient()
 
 	timeout := time.Second * 30
 
 	// Stop all containers
 	containers, err := cli.ContainerList(context.TODO(), types.ContainerListOptions{})
 	if err != nil {
-		return err
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "clear docker containers error",
+		})
 	}
 	for _, container := range containers {
 		err = cli.ContainerStop(context.TODO(), container.ID, &timeout)
-		// TODO: write this to stderr
-		log.Println(err)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "clear docker containers error",
+			})
+		}
 	}
 
 	// Remove all containers
 	containers, err = cli.ContainerList(context.TODO(), types.ContainerListOptions{})
 	if err != nil {
-		return err
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "clear docker containers error",
+		})
 	}
 	for _, container := range containers {
 		err = cli.ContainerRemove(context.TODO(), container.ID, types.ContainerRemoveOptions{})
-		// TODO: write this to stderr
-		log.Println(err)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "clear docker containers error",
+			})
+		}
 	}
-
-	return nil
 }

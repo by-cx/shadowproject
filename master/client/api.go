@@ -68,6 +68,26 @@ func (s *ShadowMasterClient) ListTasks() ([]common.Task, error) {
 	return tasks, nil
 }
 
+func (s *ShadowMasterClient) GetTask(TaskUUID string) (*common.Task, error) {
+	var task common.Task
+
+	resp, err := grequests.Get(s.formatURL("/tasks/"+TaskUUID), nil)
+	if err != nil {
+		return &task, err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return &task, errors.New(resp.RawResponse.Status)
+	}
+
+	err = json.Unmarshal(resp.Bytes(), &task)
+	if err != nil {
+		panic(err)
+	}
+
+	return &task, nil
+}
+
 func (s *ShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task, error) {
 	var task common.Task
 

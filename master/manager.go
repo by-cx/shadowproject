@@ -16,6 +16,8 @@ type TaskStorage struct {
 	db           *leveldb.DB
 }
 
+// TODO: this needs refactoring. Get misses not found feature and error handling should be similar to other parts f the code.
+
 // Open the task storage
 func (l *TaskStorage) open() *leveldb.DB {
 	if l.db == nil {
@@ -93,6 +95,24 @@ func (l *TaskStorage) Delete(taskUUID string) error {
 	db := l.open()
 
 	return db.Delete([]byte("task:"+taskUUID), &opt.WriteOptions{})
+}
+
+// Returns one task by its UUID
+func (l *TaskStorage) Get(TaskUUID string) (*common.Task, error) {
+	var task common.Task
+
+	db := l.open()
+	value, err := db.Get([]byte("task:"+TaskUUID), &opt.ReadOptions{})
+
+	err = json.Unmarshal(value, &task)
+	if err != nil {
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "marshal error",
+		})
+	}
+
+	return &task, err
 }
 
 // Filter one task based on a wanted domain

@@ -10,6 +10,7 @@ type TaskStorageInterface interface {
 	open() *leveldb.DB
 	Add(task *common.Task) error
 	Filter() []common.Task
+	Get(TaskUUID string) (*common.Task, error)
 	Delete(taskUUID string) error
 	GetByDomain(wantedDomain string) (*common.Task, error)
 	CheckDomainDuplicity(domainToCheck string) string
