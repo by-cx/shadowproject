@@ -39,3 +39,7 @@ bin/nodeproxy: bin
 .PHONY: testimage
 testimage:
 	cd contrib/testimage && docker build -t creckx/testimage:latest .
+
+.PHONY: lines
+lines:
+	@find ./common ./master ./nodeproxy ./docker -name "*.go" -exec wc -l \{\} \; | cut -d " " -f 1 | xargs  |sed "s/ /+/g" | bc
