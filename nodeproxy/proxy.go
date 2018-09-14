@@ -33,13 +33,13 @@ func FindContainer(domain string) (string, error) {
 
 	// Get the task
 	task := GetTaskByDomain(domain)
-	task.Driver = dockerDriver
+	task.ContainerDriver = dockerDriver
 
 	// Mark time of this request
 	LastRequestMap[task.UUID] = time.Now().Unix()
 
 	// Find containers and decide whether new container is needed
-	containerUUIDs := task.Driver.IsExist(task.UUID)
+	containerUUIDs := task.ContainerDriver.IsExist(task.UUID)
 
 	if len(containerUUIDs) > 0 {
 		containerUUID = containerUUIDs[rand.Int()%len(containerUUIDs)]
@@ -48,7 +48,7 @@ func FindContainer(domain string) (string, error) {
 	}
 
 	// Get the port where to point the request
-	port := task.Driver.GetPort(containerUUID)
+	port := task.ContainerDriver.GetPort(containerUUID)
 
 	// Return the destination
 	return config.ProxyTarget + ":" + strconv.Itoa(port), nil
@@ -71,7 +71,10 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	// Find the destination
 	domain, err := FindContainer(r.Host)
 	if err != nil {
-		panic(err)
+		panic(shadowerrors.ShadowError{
+			Origin:         err,
+			VisibleMessage: "backend connection error",
+		})
 	}
 
 	log.Println(r.Host, "directed to "+domain)

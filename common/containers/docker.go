@@ -1,4 +1,4 @@
-package docker
+package containers
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const DOCKER_SOCK = "unix:///var/run/docker.sock"
+const DOCKER_SOCK = "unix:///var/run/containers.sock"
 const DOCKER_API_VERSION = "1.27"
 const CONTAINER_DEFAULT_PORT = "8000/tcp"
 
@@ -27,7 +27,7 @@ func (d *DockerDriver) getClient() *dockerClient.Client {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "kill docker container error",
+			VisibleMessage: "kill containers container error",
 		})
 	}
 
@@ -44,7 +44,7 @@ func (d *DockerDriver) Kill(containerId string) {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "kill docker container error",
+			VisibleMessage: "kill containers container error",
 		})
 	}
 }
@@ -61,7 +61,7 @@ func (d *DockerDriver) IsExist(TaskUUID string) []string {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "docker error",
+			VisibleMessage: "containers error",
 		})
 	}
 	for _, containerObject := range containers {
@@ -109,7 +109,7 @@ func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) string
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "start docker container error",
+			VisibleMessage: "start containers container error",
 		})
 	}
 
@@ -128,7 +128,7 @@ func (d *DockerDriver) GetPort(containerID string) int {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "docker get port error",
+			VisibleMessage: "containers get port error",
 		})
 	}
 
@@ -140,7 +140,7 @@ func (d *DockerDriver) GetPort(containerID string) int {
 
 // Removes all containers the server contains
 func (d *DockerDriver) Clear() {
-	log.Println("Clearing docker containers")
+	log.Println("Clearing containers containers")
 	cli := d.getClient()
 
 	timeout := time.Second * 30
@@ -150,7 +150,7 @@ func (d *DockerDriver) Clear() {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "clear docker containers error",
+			VisibleMessage: "clear containers containers error",
 		})
 	}
 	for _, container := range containers {
@@ -158,7 +158,7 @@ func (d *DockerDriver) Clear() {
 		if err != nil {
 			panic(shadowerrors.ShadowError{
 				Origin:         err,
-				VisibleMessage: "clear docker containers error",
+				VisibleMessage: "clear containers containers error",
 			})
 		}
 	}
@@ -168,7 +168,7 @@ func (d *DockerDriver) Clear() {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "clear docker containers error",
+			VisibleMessage: "clear containers containers error",
 		})
 	}
 	for _, container := range containers {
@@ -176,7 +176,7 @@ func (d *DockerDriver) Clear() {
 		if err != nil {
 			panic(shadowerrors.ShadowError{
 				Origin:         err,
-				VisibleMessage: "clear docker containers error",
+				VisibleMessage: "clear containers containers error",
 			})
 		}
 	}

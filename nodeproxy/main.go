@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
-	"shadowproject/docker"
+	"shadowproject/common/containers"
 	"shadowproject/master/client"
 	"strconv"
 	"time"
@@ -11,7 +11,7 @@ import (
 
 var config NodeProxyConfig
 var shadowClient client.ShadowMasterClientInterface
-var dockerDriver docker.ContainerDriverInterface
+var dockerDriver containers.ContainerDriverInterface
 var LastRequestMap = make(map[string]int64) // Map where key is time of the last request and value is TaskUUID
 
 // TODO: kill containers after configured amount of time
@@ -32,7 +32,7 @@ func ContainerCleaner() {
 				continue
 			}
 			log.Println("Removing containers for ", taskUUID)
-			task.Driver = dockerDriver
+			task.ContainerDriver = dockerDriver
 			task.DestroyAll()
 		}
 	}
@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// Prepare the environment
-	dockerDriver = &docker.DockerDriver{}
+	dockerDriver = &containers.DockerDriver{}
 	dockerDriver.Clear()
 	log.Println("Ready to accept connections ..")
 

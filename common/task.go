@@ -4,13 +4,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"log"
-	"shadowproject/docker"
+	"shadowproject/common/containers"
 	"strings"
 	"time"
 )
 
 type Task struct {
-	Driver docker.ContainerDriverInterface `json:"-"` // Container driver for managing Containers
+	ContainerDriver containers.ContainerDriverInterface `json:"-"` // Container driver for managing Containers
 
 	UUID       string   `json:"uuid"`        // Identification of the task
 	LastUpdate int64    `json:"last_update"` // Timestamp of the last change`
@@ -24,7 +24,7 @@ func NewTask(domains []string, image string, command []string, source string) (*
 	var task Task
 
 	taskUUID := uuid.NewV4()
-	task.Driver = &docker.DockerDriver{}
+	task.ContainerDriver = &containers.DockerDriver{}
 	task.UUID = strings.Replace(taskUUID.String(), "-", "", -1)
 	task.Domains = domains
 	task.Image = image
@@ -74,14 +74,14 @@ func (t *Task) Validate() []error {
 
 // Adds new container for this task. Returns container ID and error.
 func (t *Task) AddContainer() string {
-	containerId := t.Driver.Start(t.UUID, t.Image, t.Command)
+	containerId := t.ContainerDriver.Start(t.UUID, t.Image, t.Command)
 	return containerId
 }
 
 func (t *Task) DestroyAll() {
-	log.Println(t.Driver.IsExist(t.UUID))
-	for _, containerId := range t.Driver.IsExist(t.UUID) {
+	log.Println(t.ContainerDriver.IsExist(t.UUID))
+	for _, containerId := range t.ContainerDriver.IsExist(t.UUID) {
 		log.Println("Debug: killing", containerId, "created for", t.UUID)
-		t.Driver.Kill(containerId)
+		t.ContainerDriver.Kill(containerId)
 	}
 }

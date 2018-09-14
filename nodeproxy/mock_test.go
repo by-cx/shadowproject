@@ -30,42 +30,42 @@ type MockShadowMasterClient struct {
 
 func (m *MockShadowMasterClient) AddTask(domains []string, image string, command []string) (*common.Task, error) {
 	return &common.Task{
-		Driver:  &MockDockerDriver{},
-		UUID:    "giajaiphobohroothoivaengukooquat",
-		Domains: domains,
-		Image:   image,
-		Command: command,
+		ContainerDriver: &MockDockerDriver{},
+		UUID:            "giajaiphobohroothoivaengukooquat",
+		Domains:         domains,
+		Image:           image,
+		Command:         command,
 	}, m.ReturnedErr
 }
 
 func (m *MockShadowMasterClient) ListTasks() ([]common.Task, error) {
 	return []common.Task{
 		{
-			Driver:  &MockDockerDriver{},
-			UUID:    "giajaiphobohroothoivaengukooquat",
-			Domains: []string{"localhost"},
-			Image:   "shadow/testimage",
-			Command: []string{"/srv/a_binary"},
+			ContainerDriver: &MockDockerDriver{},
+			UUID:            "giajaiphobohroothoivaengukooquat",
+			Domains:         []string{"localhost"},
+			Image:           "shadow/testimage",
+			Command:         []string{"/srv/a_binary"},
 		},
 	}, m.ReturnedErr
 }
 
 func (m *MockShadowMasterClient) GetTask(taskUUID string) (*common.Task, error) {
 	return &common.Task{
-		Driver:  &MockDockerDriver{},
-		UUID:    "giajaiphobohroothoivaengukooquat",
-		Domains: []string{"localhost"},
-		Image:   "shadow/testimage",
-		Command: []string{"/srv/a_binary"},
+		ContainerDriver: &MockDockerDriver{},
+		UUID:            "giajaiphobohroothoivaengukooquat",
+		Domains:         []string{"localhost"},
+		Image:           "shadow/testimage",
+		Command:         []string{"/srv/a_binary"},
 	}, m.ReturnedErr
 }
 
 func (m *MockShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task, error) {
 	return &common.Task{
-		Driver:  &MockDockerDriver{},
-		UUID:    "giajaiphobohroothoivaengukooquat",
-		Domains: []string{"localhost"},
-		Image:   "shadow/testimage",
-		Command: []string{"/srv/a_binary"},
+		ContainerDriver: &MockDockerDriver{},
+		UUID:            "giajaiphobohroothoivaengukooquat",
+		Domains:         []string{"localhost"},
+		Image:           "shadow/testimage",
+		Command:         []string{"/srv/a_binary"},
 	}, m.ReturnedErr
 }

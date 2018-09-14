@@ -42,3 +42,4 @@ The architecture is not finished yet and a lot of things can change.
 * Support for stateful tasks
 * Support for stateless tasks - no permanent storage
 * Autoscaling for stateless tasks based on CPU load
+* Accounting

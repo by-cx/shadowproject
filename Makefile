@@ -1,4 +1,4 @@
-modules=./common ./common/errors ./master ./master/client ./proxy ./docker ./nodeproxy
+modules=./common ./common/errors ./common/containers ./common/volumes ./master ./master/client ./proxy ./nodeproxy
 
 .PHONY: all
 all: build
@@ -42,4 +42,4 @@ testimage:
 
 .PHONY: lines
 lines:
-	@find ./common ./master ./nodeproxy ./docker -name "*.go" -exec wc -l \{\} \; | cut -d " " -f 1 | xargs  |sed "s/ /+/g" | bc
+	@find ${modules} -name "*.go" -exec wc -l \{\} \; | cut -d " " -f 1 | xargs  |sed "s/ /+/g" | bc

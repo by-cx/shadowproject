@@ -14,6 +14,11 @@ type NodeProxyConfig struct {
 	MasterProto string `env:"MASTER_PROTO" envDefault:"http"`
 	Port        int    `env:"PORT" envDefault:"8081"`
 	ProxyTarget string `env:"PROXY_TARGET" envDefault:"localhost"`
+	S3Endpoint  string `env:"S3_ENDPOINT" envDefault:"127.0.0.1:9000"`
+	S3Bucket    string `env:"S3_BUCKET" envDefault:"shadowproject"`
+	S3SSL       bool   `env:"S3_SSL" envDefault:"0"`
+	S3AccessKey string `env:"S3_ACCESS_KEY"`
+	S3SecretKey string `env:"S3_SECRET_KEY"`
 }
 
 // Handle the config

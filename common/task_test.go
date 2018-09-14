@@ -38,16 +38,16 @@ func (d *DummyErrorDriver) Clear() {}
 func TestTask(t *testing.T) {
 	// Valid state
 	task := Task{
-		Driver: &DummyDriver{},
-		UUID:   "peisaipaishequaeroofeeyoghahwool",
+		ContainerDriver: &DummyDriver{},
+		UUID:            "peisaipaishequaeroofeeyoghahwool",
 	}
 	task.AddContainer()
 	task.DestroyAll()
 
 	// Error state
 	task = Task{
-		Driver: &DummyErrorDriver{},
-		UUID:   "peisaipaishequaeroofeeyoghahwool",
+		ContainerDriver: &DummyErrorDriver{},
+		UUID:            "peisaipaishequaeroofeeyoghahwool",
 	}
 	task.AddContainer()
 	task.DestroyAll()
