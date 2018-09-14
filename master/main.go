@@ -19,11 +19,11 @@ func main() {
 	db := taskStorage.open()
 	defer db.Close()
 
-	// TODO: Update tasks
-
+	// API endpoint
 	e := echo.New()
 	e.POST("/tasks/", CreateTaskHandler)
 	e.GET("/tasks/", ListTaskHandler)
+	e.PUT("/tasks/:uuid", UpdateTaskHandler)
 	e.GET("/tasks/:uuid", GetTaskHandler)
 	e.DELETE("/tasks/:uuid", DeleteTaskHandler)
 	e.GET("/tasks/by-domain/:domain", GetTaskByDomainHandler)

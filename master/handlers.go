@@ -16,7 +16,7 @@ func CreateTaskHandler(c echo.Context) error {
 	}
 
 	// Creating a new structure. The NewTask function validates the data by itself.
-	task, errs := common.NewTask(inputTask.Domains, inputTask.Image, inputTask.Command)
+	task, errs := common.NewTask(inputTask.Domains, inputTask.Image, inputTask.Command, inputTask.Source)
 	if len(errs) > 0 {
 		message := ""
 		for _, err := range errs {
@@ -28,6 +28,30 @@ func CreateTaskHandler(c echo.Context) error {
 	err = taskStorage.Add(task)
 	if err != nil {
 		return c.JSONPretty(http.StatusBadRequest, common.GeneralResponse{Message: err.Error()}, common.JSON_INDENT)
+	}
+
+	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)
+}
+
+// Handler to update the existing task
+func UpdateTaskHandler(c echo.Context) error {
+	var inputTask common.Task
+
+	taskUUID := c.Param("uuid")
+
+	err := c.Bind(&inputTask)
+	if err != nil {
+		return c.JSONPretty(http.StatusBadRequest, common.GeneralResponse{Message: err.Error()}, common.JSON_INDENT)
+	}
+
+	// Creating a new structure. The NewTask function validates the data by itself.
+	task, errs := taskStorage.Update(taskUUID, inputTask.Domains, inputTask.Image, inputTask.Command, inputTask.Source)
+	if len(errs) > 0 {
+		message := ""
+		for _, err := range errs {
+			message += err.Error()
+		}
+		return c.JSONPretty(http.StatusBadRequest, common.GeneralResponse{Message: message}, common.JSON_INDENT)
 	}
 
 	return c.JSONPretty(http.StatusOK, task, common.JSON_INDENT)

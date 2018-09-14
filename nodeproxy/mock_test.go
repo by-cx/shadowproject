@@ -50,6 +50,16 @@ func (m *MockShadowMasterClient) ListTasks() ([]common.Task, error) {
 	}, m.ReturnedErr
 }
 
+func (m *MockShadowMasterClient) GetTask(taskUUID string) (*common.Task, error) {
+	return &common.Task{
+		Driver:  &MockDockerDriver{},
+		UUID:    "giajaiphobohroothoivaengukooquat",
+		Domains: []string{"localhost"},
+		Image:   "shadow/testimage",
+		Command: []string{"/srv/a_binary"},
+	}, m.ReturnedErr
+}
+
 func (m *MockShadowMasterClient) GetTaskByDomain(wantedDomain string) (*common.Task, error) {
 	return &common.Task{
 		Driver:  &MockDockerDriver{},

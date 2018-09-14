@@ -9,6 +9,7 @@ import (
 type TaskStorageInterface interface {
 	open() *leveldb.DB
 	Add(task *common.Task) error
+	Update(taskUUID string, domains []string, image string, command []string, source string) (*common.Task, []error)
 	Filter() []common.Task
 	Get(TaskUUID string) (*common.Task, error)
 	Delete(taskUUID string) error

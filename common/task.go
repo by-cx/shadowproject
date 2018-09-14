@@ -6,18 +6,21 @@ import (
 	"log"
 	"shadowproject/docker"
 	"strings"
+	"time"
 )
 
 type Task struct {
 	Driver docker.ContainerDriverInterface `json:"-"` // Container driver for managing Containers
 
-	UUID    string   `json:"uuid"`    // Identification of the task
-	Domains []string `json:"domains"` // Domain list on which this tasks listens
-	Image   string   `json:"image"`   // Docker image
-	Command []string `json:"command"` // Command to run
+	UUID       string   `json:"uuid"`        // Identification of the task
+	LastUpdate int64    `json:"last_update"` // Timestamp of the last change`
+	Domains    []string `json:"domains"`     // Domain list on which this tasks listens
+	Image      string   `json:"image"`       // Docker image
+	Command    []string `json:"command"`     // Command to run
+	Source     string   `json:"source"`      // Where the source code is located on our S3 bucket
 }
 
-func NewTask(domains []string, image string, command []string) (*Task, []error) {
+func NewTask(domains []string, image string, command []string, source string) (*Task, []error) {
 	var task Task
 
 	taskUUID := uuid.NewV4()
@@ -26,10 +29,24 @@ func NewTask(domains []string, image string, command []string) (*Task, []error) 
 	task.Domains = domains
 	task.Image = image
 	task.Command = command
+	task.Source = source
+	task.LastUpdate = time.Now().Unix()
 
 	errorList := task.Validate()
 
 	return &task, errorList
+}
+
+func (t *Task) Update(domains []string, image string, command []string, source string) []error {
+	t.Domains = domains
+	t.Image = image
+	t.Command = command
+	t.Source = source
+	t.LastUpdate = time.Now().Unix()
+
+	errorList := t.Validate()
+
+	return errorList
 }
 
 // Task data validation
@@ -47,6 +64,9 @@ func (t *Task) Validate() []error {
 	}
 	if len(t.Domains) == 0 {
 		errorList = append(errorList, errors.New("define at least one domain"))
+	}
+	if len(t.Source) == 0 {
+		errorList = append(errorList, errors.New("path to the source has to be defined"))
 	}
 
 	return errorList

@@ -21,21 +21,23 @@ const KILL_AFTER = 10
 
 func ContainerCleaner() {
 	now := time.Now().Unix()
+	log.Println("Container cleaner is running..")
 
 	for taskUUID, lastRequestTime := range LastRequestMap {
-		log.Println("TaskUUID clenaer:", taskUUID)
 		if now-lastRequestTime > KILL_AFTER {
 			task, err := shadowClient.GetTask(taskUUID)
 			if err != nil {
+				// TODO: write this into
 				log.Println("Container cleaner error:", err)
 				continue
 			}
 			log.Println("Removing containers for ", taskUUID)
-			log.Println("Task:", task)
 			task.Driver = dockerDriver
 			task.DestroyAll()
 		}
 	}
+
+	log.Println("Container cleaner is done..")
 }
 
 func main() {

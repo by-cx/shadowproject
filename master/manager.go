@@ -61,11 +61,58 @@ func (l *TaskStorage) Add(task *common.Task) error {
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
-			VisibleMessage: "database error",
+			VisibleMessage: "add to database error",
 		})
 	}
 
 	return nil
+}
+
+// Update parameters of the task with taskUUID
+func (l *TaskStorage) Update(taskUUID string, domains []string, image string, command []string, source string) (*common.Task, []error) {
+	db := l.open()
+
+	// Find the task
+	task, err := l.Get(taskUUID)
+	if err != nil {
+		return nil, []error{err}
+	}
+
+	// Try to update the task
+	errorList := task.Update(domains, image, command, source)
+
+	if len(errorList) == 0 {
+		// Check if domains are duplicated
+		var duplicatedDomains []string
+		for _, domain := range task.Domains {
+			if l.CheckDomainDuplicity(domain) != "" {
+				duplicatedDomains = append(duplicatedDomains, domain)
+			}
+		}
+		if len(duplicatedDomains) != 0 {
+			return task, []error{errors.New("these domains are already in the system: " + strings.Join(duplicatedDomains, ", "))}
+		}
+
+		// Make a JSON from it
+		jsonBody, err := json.Marshal(task)
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "marshal error",
+			})
+		}
+
+		// Replace the old version of the task
+		err = db.Put([]byte("task:"+task.UUID), jsonBody, &opt.WriteOptions{})
+		if err != nil {
+			panic(shadowerrors.ShadowError{
+				Origin:         err,
+				VisibleMessage: "update in database error",
+			})
+		}
+	}
+
+	return task, errorList
 }
 
 // Return list of all tasks
@@ -112,6 +159,7 @@ func (l *TaskStorage) Get(TaskUUID string) (*common.Task, error) {
 		})
 	}
 
+	// TODO: implement not found error
 	return &task, err
 }
 
