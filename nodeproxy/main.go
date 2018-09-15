@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"shadowproject/common/containers"
+	"shadowproject/common/volumes"
 	"shadowproject/master/client"
 	"strconv"
 	"time"
@@ -12,6 +13,8 @@ import (
 var config NodeProxyConfig
 var shadowClient client.ShadowMasterClientInterface
 var dockerDriver containers.ContainerDriverInterface
+var S3VolumeDriver *volumes.S3Volume
+
 var LastRequestMap = make(map[string]int64) // Map where key is time of the last request and value is TaskUUID
 
 // TODO: kill containers after configured amount of time
@@ -51,10 +54,19 @@ func main() {
 		Proto: config.MasterProto,
 	}
 
-	// Prepare the environment
+	// Prepare the environment - docker driver
 	dockerDriver = &containers.DockerDriver{}
 	dockerDriver.Clear()
 	log.Println("Ready to accept connections ..")
+
+	// Prepare volume driver
+	S3VolumeDriver = &volumes.S3Volume{
+		Endpoint:  config.S3Endpoint,
+		Bucket:    config.S3Bucket,
+		AccessKey: config.S3AccessKey,
+		SecretKey: config.S3SecretKey,
+		SSL:       config.S3SSL,
+	}
 
 	// Container cleaner
 	go func() {

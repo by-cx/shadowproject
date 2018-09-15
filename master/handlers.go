@@ -16,7 +16,7 @@ func CreateTaskHandler(c echo.Context) error {
 	}
 
 	// Creating a new structure. The NewTask function validates the data by itself.
-	task, errs := common.NewTask(inputTask.Domains, inputTask.Image, inputTask.Command, inputTask.Source)
+	task, errs := common.NewTask(inputTask.Domains, inputTask.Image, inputTask.Command, inputTask.VolumeType, inputTask.Source)
 	if len(errs) > 0 {
 		message := ""
 		for _, err := range errs {

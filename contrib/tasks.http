@@ -5,7 +5,9 @@ Content-Type: application/json
 {
   "image": "creckx/testimage",
   "domains": ["localhost:8081"],
-  "command": ["/srv/testtask"]
+  "command": ["/srv/testtask"],
+  "volume_type": "S3",
+  "source": "testtask.zip"
 }
 
 ###
@@ -24,6 +26,6 @@ Content-Type: application/json
 
 # Delete by UUID
 
-DELETE http://localhost:8080/tasks/c7d45d0c-20ca-4e45-9512-2f7dcc46bb54
+DELETE http://localhost:8080/tasks/faa4ccba914e4dc09b3a732ef76df951
 
 ###

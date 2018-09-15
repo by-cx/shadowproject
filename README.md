@@ -43,3 +43,12 @@ The architecture is not finished yet and a lot of things can change.
 * Support for stateless tasks - no permanent storage
 * Autoscaling for stateless tasks based on CPU load
 * Accounting
+
+## The tests
+
+S3 is not properly mocked so to run the test, fire up a minio server:
+
+    export MINIO_ACCESS_KEY=3D2U2V66A3CP0CB088Z3
+    export MINIO_SECRET_KEY=Uipi4szPTGhyjoTFsmtXJrIf9cbqnfLRPQH6e8Ho
+    minio server /tmp/minio/
+    

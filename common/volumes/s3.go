@@ -1,7 +1,6 @@
 package volumes
 
 import (
-	"compress/gzip"
 	"github.com/mholt/archiver"
 	"github.com/minio/minio-go"
 	"github.com/satori/go.uuid"
@@ -21,7 +20,7 @@ type S3Volume struct {
 	SSL       bool
 }
 
-func (s *S3Volume) getMinioClient() *minio.Client {
+func (s *S3Volume) GetMinioClient() *minio.Client {
 	minioClient, err := minio.New(s.Endpoint, s.AccessKey, s.SecretKey, s.SSL)
 	if err != nil {
 		panic(shadowerrors.ShadowError{
@@ -35,7 +34,7 @@ func (s *S3Volume) getMinioClient() *minio.Client {
 
 // Downloads the object from S3 bucket/source, unzips it and copies content into the target.
 func (s *S3Volume) Mount(source string, target string) {
-	client := s.getMinioClient()
+	client := s.GetMinioClient()
 
 	//Get the object
 	object, err := client.GetObject(s.Bucket, source, minio.GetObjectOptions{})
@@ -45,16 +44,6 @@ func (s *S3Volume) Mount(source string, target string) {
 			VisibleMessage: "get object from s3 error",
 		})
 	}
-
-	// Unzipping
-	reader, err := gzip.NewReader(object)
-	if err != nil {
-		panic(shadowerrors.ShadowError{
-			Origin:         err,
-			VisibleMessage: "unarchiving object error",
-		})
-	}
-	defer reader.Close()
 
 	// Copying the file into tmp
 	archivePath := "/tmp/" + uuid.NewV4().String() + ".zip"
@@ -66,15 +55,15 @@ func (s *S3Volume) Mount(source string, target string) {
 			VisibleMessage: "unarchiving object error",
 		})
 	}
-	file.Close()
 
-	_, err = io.Copy(file, reader)
+	_, err = io.Copy(file, object)
 	if err != nil {
 		panic(shadowerrors.ShadowError{
 			Origin:         err,
 			VisibleMessage: "copying the file from the object error",
 		})
 	}
+	file.Close()
 
 	// Unzipping
 	err = archiver.Zip.Open(archivePath, target)

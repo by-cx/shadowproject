@@ -1,10 +1,12 @@
 package main
 
 import (
+	"github.com/pkg/errors"
 	"io"
 	"log"
 	"math/rand"
 	"net/http"
+	"runtime/debug"
 	"shadowproject/common"
 	shadowerrors "shadowproject/common/errors"
 	"strconv"
@@ -34,6 +36,14 @@ func FindContainer(domain string) (string, error) {
 	// Get the task
 	task := GetTaskByDomain(domain)
 	task.ContainerDriver = dockerDriver
+	if task.VolumeType == common.VolumeTypeS3 {
+		task.VolumeDriver = S3VolumeDriver
+	} else {
+		panic(shadowerrors.ShadowError{
+			VisibleMessage: "unknown volume driver",
+			Origin:         errors.New("unknown volume driver"),
+		})
+	}
 
 	// Mark time of this request
 	LastRequestMap[task.UUID] = time.Now().Unix()
@@ -60,6 +70,9 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 	// In case of failure, print the error message so user can see what is happening
 	defer func() {
 		if r := recover(); r != nil {
+			if config.Debug {
+				debug.PrintStack()
+			}
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(r.(error).Error()))
 		}

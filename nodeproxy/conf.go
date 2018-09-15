@@ -13,6 +13,7 @@ type NodeProxyConfig struct {
 	MasterPort  int    `env:"MASTER_PORT" envDefault:"8080"`
 	MasterProto string `env:"MASTER_PROTO" envDefault:"http"`
 	Port        int    `env:"PORT" envDefault:"8081"`
+	Debug       bool   `env:"DEBUG" envDefault:"1"` // Prints trace back into console in case of panic
 	ProxyTarget string `env:"PROXY_TARGET" envDefault:"localhost"`
 	S3Endpoint  string `env:"S3_ENDPOINT" envDefault:"127.0.0.1:9000"`
 	S3Bucket    string `env:"S3_BUCKET" envDefault:"shadowproject"`

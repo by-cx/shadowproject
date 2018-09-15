@@ -13,10 +13,10 @@ func New(message string, err error) error {
 	}
 }
 
-func (s *ShadowError) Error() string {
+func (s ShadowError) Error() string {
 	return s.Origin.Error()
 }
 
-func (s *ShadowError) Message() string {
+func (s ShadowError) Message() string {
 	return s.VisibleMessage
 }

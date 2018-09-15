@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const DOCKER_SOCK = "unix:///var/run/containers.sock"
+const DOCKER_SOCK = "unix:///var/run/docker.sock"
 const DOCKER_API_VERSION = "1.27"
 const CONTAINER_DEFAULT_PORT = "8000/tcp"
 
@@ -34,6 +34,7 @@ func (d *DockerDriver) getClient() *dockerClient.Client {
 	return cli
 }
 
+// Removes container with containerId ID.
 func (d *DockerDriver) Kill(containerId string) {
 	log.Println("Stopping container " + containerId)
 	cli := d.getClient()
@@ -64,10 +65,14 @@ func (d *DockerDriver) IsExist(TaskUUID string) []string {
 			VisibleMessage: "containers error",
 		})
 	}
+
+	// We go through the containers and pick the ones which match the task name and also they are in
+	// running state. This should avoid situations the container is shutting down, request comes
+	// and proxy sends it there.
 	for _, containerObject := range containers {
 		for _, name := range containerObject.Names {
 			name = strings.Trim(name, "/")
-			if strings.Split(name, ".")[0] == TaskUUID {
+			if strings.Split(name, ".")[0] == TaskUUID && containerObject.Status == "running" {
 				containerIDs = append(containerIDs, containerObject.ID)
 			}
 		}
@@ -77,7 +82,10 @@ func (d *DockerDriver) IsExist(TaskUUID string) []string {
 }
 
 // Starts the container
-func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) string {
+// image - docker image
+// cmd - string slice of command and its arguments
+// target - directory to mount into the container
+func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string, target string) string {
 	log.Println("Starting container " + TaskUUID)
 	cli := d.getClient()
 
@@ -100,7 +108,7 @@ func (d *DockerDriver) Start(TaskUUID string, image string, cmd []string) string
 			PortBindings: portmaps,
 			AutoRemove:   true,
 			Binds: []string{
-				"/srv/" + TaskUUID + ":/srv",
+				target + ":/srv",
 			},
 		},
 		&network.NetworkingConfig{},
