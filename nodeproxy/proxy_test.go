@@ -19,6 +19,7 @@ func TestGetTaskByDomain(t *testing.T) {
 func TestFindContainer(t *testing.T) {
 	shadowClient = &MockShadowMasterClient{}
 	dockerDriver = &MockDockerDriver{}
+	S3VolumeDriver = &MockS3VolumeDriver{}
 	ProcessEnvironmentVariables(&config)
 
 	containerId, err := FindContainer("localhost")

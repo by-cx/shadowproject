@@ -13,7 +13,7 @@ import (
 var config NodeProxyConfig
 var shadowClient client.ShadowMasterClientInterface
 var dockerDriver containers.ContainerDriverInterface
-var S3VolumeDriver *volumes.S3Volume
+var S3VolumeDriver volumes.VolumeInterface
 
 var LastRequestMap = make(map[string]int64) // Map where key is time of the last request and value is TaskUUID
 
