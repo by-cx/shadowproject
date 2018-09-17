@@ -7,6 +7,9 @@ import (
 //// Docker mock driver
 type MockDockerDriver struct{}
 
+func (m *MockDockerDriver) Status() bool {
+	return true
+}
 func (m *MockDockerDriver) IsExist(TaskUUID string) []string {
 	return []string{}
 }

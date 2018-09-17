@@ -34,6 +34,18 @@ func (d *DockerDriver) getClient() *dockerClient.Client {
 	return cli
 }
 
+// Checks connection to the Docker daemon
+func (d *DockerDriver) Status() bool {
+	cli := d.getClient()
+
+	_, err := cli.ServerVersion(context.TODO())
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 // Removes container with containerId ID.
 func (d *DockerDriver) Kill(containerId string) {
 	log.Println("Stopping container " + containerId)

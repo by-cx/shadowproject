@@ -6,4 +6,5 @@ type ContainerDriverInterface interface {
 	Start(TaskUUID string, image string, cmd []string, target string) string
 	GetPort(containerID string) int
 	Clear()
+	Status() bool
 }

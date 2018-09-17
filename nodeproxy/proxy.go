@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/pkg/errors"
 	"io"
 	"log"
@@ -64,6 +65,21 @@ func FindContainer(domain string) (string, error) {
 	return config.ProxyTarget + ":" + strconv.Itoa(port), nil
 }
 
+// Returns json string with server status
+func getJSONedHealth() []byte {
+	status := HealthCheck()
+	content, err := json.Marshal(status)
+
+	if err != nil {
+		panic(shadowerrors.ShadowError{
+			VisibleMessage: "health check error",
+			Origin:         errors.New("unknown volume driver"),
+		})
+	}
+
+	return content
+}
+
 // This takes incoming request, updated URL struct and sends it to the backend.
 // Then the response is streamed back including headers.
 func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +94,14 @@ func ReverseProxyHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
+	// Health check
+	if r.URL.Path == "/server-health-check" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(getJSONedHealth())
+		return
+	}
+
+	// Processing the reverse proxy request
 	var remoteRequest http.Request
 	remoteRequest = *r
 
