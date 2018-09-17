@@ -8,6 +8,9 @@ import (
 // Dummy ok backend
 type DummyDriver struct{}
 
+func (d *DummyDriver) Status() bool {
+	return true
+}
 func (d *DummyDriver) IsExist(TaskUUID string) []string {
 	return []string{}
 }
